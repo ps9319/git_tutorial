@@ -1,0 +1,43 @@
+1966
+10799
+3190
+1918
+2800
+
+ from collections import deque
+import sys
+input = sys.stdin.readline
+
+
+def bfs():
+    M, N = map(int, input().split())
+    queue = deque(list(map(int, input().split())))
+    index = N - 1
+    result = 0
+    if M == 1:
+        print(1)
+        return
+    while 1:
+        is_print = queue.popleft()
+        if not queue:
+            print(result)
+            break
+
+        if is_print >= max(queue):
+            index -= 1
+            result += 1
+            if index == 0:
+                print(result)
+                break
+        else:
+            queue.append(is_print)
+            if index == 0:
+                index = len(queue) - 2
+            else:
+                index -= 1
+
+
+
+R = int(input())
+for i in range(R):
+    bfs()
