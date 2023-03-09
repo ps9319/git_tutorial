@@ -2,70 +2,56 @@ import sys
 input = sys.stdin.readline
 
 
-def BT(N, M):
-    if len(result) == M:
-        put_list.append(list(result))
-        return
-
-    for i in range(1, N):
-        if i not in result:
-            if not result:
-                result.append(i)
-                BT(N, M)
-                result.pop()
-            else:
-                if i > max(result):
-                    result.append(i)
-                    BT(N, M)
-                    result.pop()
-    return
+def swap(str1, op, str2):
+    return str1+str2+op
 
 
-math_list = input().rstrip()
-result = []
-# ()순서쌍 만들 때
-stack = []
-# ()순서쌍의 인덱스 저장할 때
-couple = {}
-# nCr 조합
-put_list = []
-# 내가 출력할 문자열
-answer_list = []
-count_couple = 0
-# ()쌍 찾고 순서 매기고 좌표 저장하기
-for i in range(len(math_list)):
-    if math_list[i] == '(':
-        stack.append(i)
-    if math_list[i] == ')':
-        a, b = stack.pop(), i
-        count_couple += 1
-        couple[count_couple] = (a, b)
-# answer_result 에 추가
-for i in range(1, count_couple + 1):
-    BT(count_couple + 1, i)
+def put_both(string):
+    return '('+ string + ')'
 
-while put_list:
-    result_math_list = math_list
-    for delete_couple in put_list[-1]:
-        x, y = couple[delete_couple]
-        math_list = list(math_list)
-        math_list[x] = "X"
-        math_list[y] = "X"
-        math_list = ''.join(math_list)
-        answer_list.append(math_list.replace("X",""))
-        math_list = result_math_list
-        put_list.pop()
-answer_list.sort()
-for answer in answer_list:
-    print(answer)
+
+def find_left_right(index):
+    # 왼쪽부터 )가 있는지 확인, 오른쪽은 (
+    # 왼쪽부터 탐색하는 이유는 양쪽에 *나 /가 있을 때는 왼쪽에 괄호를 쳐야되기 때문
+    # *나 /기호 왼쪽에 ()가 있음
+    if expression[index - 1] == ')':
+        tmp_index = index - 1
+        while 1:
+            tmp_index -= 1
+            if expression[tmp_index] == '(':
+                return tmp_index, index + 1, 'left'
+    # *나 /기호 오른쪽에 ()가 있음
+    elif expression[index + 1] == '(':
+        tmp_index = index + 1
+        while 1:
+            tmp_index += 1
+            if expression[tmp_index] == ')':
+                return index - 1, tmp_index, 'right'
+    # *나 /기호 양 옆에 ()가 없음
+    else:
+        return index - 1, index + 1, 'none'
+
+
+expression = input().rstrip()
+# (를 result 에 insert
+open_left = False
+# 입력 받은 문자열에 이미 (가 존재하는지
+is_left = False
+for i in range(len(expression)):
+    letter = expression[i]
+    if letter == '*' or letter == '/':
+        start, end, direct = find_left_right(i)
+
+        start_to_end = expression[start:end + 1]
+        result = expression.replace(start_to_end, put_both(start_to_end))
+
+
+
+print(result)
 """
-처음 문제를 보고 든 생각
-각 ()쌍의 위치를 기억하고 번호를 매겨 리스트에 저장해둔 다음
-nCr 조합을 써서 for 문을 써서 nC1, nC2, nC3 ... nCn 개의 ()쌍을 제거한다.
-()쌍을 제거한 식은 또 다른 식에 저장해놓고 sort 를 해서 출력한다.
-
-1. 얕은 복사를 해서 BT 함수를 써서 조합식을 저장할 때 다 빈 리스트로 저장이 되었다.
-2. 입력 받은 값은 문자열이고 문자열은 인덱싱이 가능하니까 그 문자열은 수정이 가능하다고 생각했는데 수정이 불가능했다.
-그래서 그 문자열을 리스트로 형변환해주고 수정하고 싶은 부분을 수정하고 다시 str 로 형변환하려고 했는데 안됐다.
+처음 생각
+아스키 코드를 활용하면 좋을 것 같다.
+*와 /가 나왔을 때 괄호로 먼저 감싸주어야 하기 때문에 *와 /가 중요해보인다.
 
 """
+#(letter == ')' or
