@@ -7,29 +7,42 @@ def swap(str1, op, str2):
 
 
 def put_both(string):
-    return '('+ string + ')'
+    return '(' + string + ')'
 
 
 def find_left_right(index):
-    # 왼쪽부터 )가 있는지 확인, 오른쪽은 (
-    # 왼쪽부터 탐색하는 이유는 양쪽에 *나 /가 있을 때는 왼쪽에 괄호를 쳐야되기 때문
-    # *나 /기호 왼쪽에 ()가 있음
-    if expression[index - 1] == ')':
+    if expression[index - 1] == ')' and expression[index + 1] == '(':
         tmp_index = index - 1
         while 1:
             tmp_index -= 1
             if expression[tmp_index] == '(':
-                return tmp_index, index + 1, 'left'
+                st = tmp_index
+                break
+        tmp_index = index + 1
+        while 1:
+            tmp_index += 1
+            if expression[tmp_index] == ')':
+                ed = tmp_index
+                break
+        return st, ed
+
+    # *나 /기호 왼쪽에 ()가 있음
+    elif expression[index - 1] == ')':
+        tmp_index = index - 1
+        while 1:
+            tmp_index -= 1
+            if expression[tmp_index] == '(':
+                return tmp_index, index + 1
     # *나 /기호 오른쪽에 ()가 있음
     elif expression[index + 1] == '(':
         tmp_index = index + 1
         while 1:
             tmp_index += 1
             if expression[tmp_index] == ')':
-                return index - 1, tmp_index, 'right'
+                return index - 1, tmp_index
     # *나 /기호 양 옆에 ()가 없음
     else:
-        return index - 1, index + 1, 'none'
+        return index - 1, index + 1
 
 
 expression = input().rstrip()
@@ -37,21 +50,55 @@ expression = input().rstrip()
 open_left = False
 # 입력 받은 문자열에 이미 (가 존재하는지
 is_left = False
+result = expression
+"""
 for i in range(len(expression)):
     letter = expression[i]
     if letter == '*' or letter == '/':
-        start, end, direct = find_left_right(i)
-
+        start, end = find_left_right(i)
         start_to_end = expression[start:end + 1]
-        result = expression.replace(start_to_end, put_both(start_to_end))
+        result = result.replace(start_to_end, put_both(start_to_end))
+expression = result
+for i in range(len(expression)):
+    letter = expression[i]
+    if letter == '+' or letter == '-':
+        start, end = find_left_right(i)
+        start_to_end = expression[start:end + 1]
+        result = result.replace(start_to_end, put_both(start_to_end))
+"""
+index = 0
+a = expression
+while 1:
+    if index >= len(expression):
+        break
+    letter = expression[index]
+    if letter == '*' or letter == '/':
+        start, end = find_left_right(index)
+        start_to_end = expression[start:end + 1]
+        expression = expression.replace(start_to_end, put_both(start_to_end))
+        # 삭제
+        a = expression
+        index += 1
+    index += 1
+index = 0
+while 1:
+    if index >= len(expression):
+        break
+    letter = expression[index]
+    if letter == '+' or letter == '-':
+        start, end = find_left_right(index)
+        start_to_end = expression[start:end + 1]
+        expression = expression.replace(start_to_end, put_both(start_to_end))
+        # 삭제
+        a = expression
+        index += 1
+    index += 1
 
 
-
-print(result)
+print(expression)
 """
 처음 생각
 아스키 코드를 활용하면 좋을 것 같다.
 *와 /가 나왔을 때 괄호로 먼저 감싸주어야 하기 때문에 *와 /가 중요해보인다.
-
+문제에서 괄호를 넣어주라고 했는데 복잡할 것 같아서 안 넣고 해보려 했는데 안돼서 괄호를 넣고 다시 생각해보기로...
 """
-#(letter == ')' or
